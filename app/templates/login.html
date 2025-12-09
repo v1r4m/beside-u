@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}로그인 - Beside-U{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="text-align: center; margin-bottom: 25px; font-size: 22px;">로그인</h2>
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="email">이메일</label>
+            <input type="email" id="email" name="email" placeholder="example@email.com" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">로그인</button>
+    </form>
+
+    <p class="text-center mt-20 text-muted">
+        계정이 없으신가요? <a href="{{ url_for('register') }}" class="link">회원가입</a>
+    </p>
+</div>
+{% endblock %}

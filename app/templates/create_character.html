@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}캐릭터 만들기 - Beside-U{% endblock %}
+
+{% block extra_css %}
+<style>
+    .image-upload {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        margin: 0 auto 25px;
+    }
+
+    .image-upload input[type="file"] {
+        display: none;
+    }
+
+    .image-preview {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        border: 3px dashed rgba(255, 255, 255, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        overflow: hidden;
+        transition: all 0.3s;
+    }
+
+    .image-preview:hover {
+        border-color: #e94560;
+    }
+
+    .image-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .image-preview .placeholder {
+        text-align: center;
+        color: #8892b0;
+    }
+
+    .image-preview .placeholder svg {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 8px;
+        opacity: 0.5;
+    }
+
+    .image-preview .placeholder span {
+        display: block;
+        font-size: 12px;
+    }
+
+    .character-info {
+        background: rgba(100, 255, 218, 0.1);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #64ffda;
+    }
+
+    .header-nav {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+    }
+
+    .logout-link {
+        color: #8892b0;
+        font-size: 14px;
+        text-decoration: none;
+    }
+
+    .logout-link:hover {
+        color: #e94560;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="header-nav">
+    <a href="{{ url_for('logout') }}" class="logout-link">로그아웃</a>
+</div>
+
+<div class="card">
+    <h2 style="text-align: center; margin-bottom: 15px; font-size: 22px;">캐릭터 만들기</h2>
+
+    <div class="character-info">
+        당신만의 특별한 캐릭터를 만들어보세요. 매일 새로운 질문에 캐릭터가 답변해줄 거예요!
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="image-upload">
+            <label for="image">
+                <div class="image-preview" id="imagePreview">
+                    <div class="placeholder">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        <span>사진 추가</span>
+                    </div>
+                </div>
+            </label>
+            <input type="file" id="image" name="image" accept="image/*">
+        </div>
+
+        <div class="form-group">
+            <label for="name">캐릭터 이름</label>
+            <input type="text" id="name" name="name" placeholder="예: 하늘이" required maxlength="100">
+        </div>
+
+        <div class="form-group">
+            <label for="description">캐릭터 설명</label>
+            <textarea id="description" name="description" placeholder="캐릭터의 성격, 특징, 말투 등을 자세히 적어주세요. 예: 밝고 긍정적인 성격의 20대 여성. 항상 웃으면서 대화하고, 상대방을 배려하는 말투를 사용해요." required maxlength="1000"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">캐릭터 생성하기</button>
+    </form>
+</div>
+
+<script>
+    const imageInput = document.getElementById('image');
+    const imagePreview = document.getElementById('imagePreview');
+
+    imageInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock %}

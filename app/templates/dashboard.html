@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}{{ character.name }} - Beside-U{% endblock %}
+
+{% block extra_css %}
+<style>
+    .header-nav {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+    }
+
+    .logout-link {
+        color: #8892b0;
+        font-size: 14px;
+        text-decoration: none;
+    }
+
+    .logout-link:hover {
+        color: #e94560;
+    }
+
+    .character-profile {
+        text-align: center;
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+
+    .character-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 0 auto 15px;
+        overflow: hidden;
+        border: 4px solid rgba(233, 69, 96, 0.5);
+        box-shadow: 0 10px 30px rgba(233, 69, 96, 0.2);
+    }
+
+    .character-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .character-avatar .default-avatar {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #e94560, #ff6b9d);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .character-name {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #fff;
+    }
+
+    .character-desc {
+        font-size: 14px;
+        color: #8892b0;
+        line-height: 1.6;
+        max-height: 60px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #ccd6f6;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title::before {
+        content: '';
+        width: 4px;
+        height: 20px;
+        background: linear-gradient(135deg, #e94560, #ff6b9d);
+        border-radius: 2px;
+    }
+
+    .question-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s;
+    }
+
+    .question-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .question-card.answered {
+        border-color: rgba(100, 255, 218, 0.3);
+    }
+
+    .question-day {
+        font-size: 12px;
+        color: #e94560;
+        font-weight: 600;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .question-text {
+        font-size: 16px;
+        font-weight: 500;
+        color: #fff;
+        margin-bottom: 15px;
+    }
+
+    .answer-box {
+        background: rgba(100, 255, 218, 0.1);
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 15px;
+    }
+
+    .answer-label {
+        font-size: 12px;
+        color: #64ffda;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .answer-text {
+        font-size: 15px;
+        color: #ccd6f6;
+        line-height: 1.7;
+    }
+
+    .btn-generate {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #e94560, #ff6b9d);
+        border: none;
+        border-radius: 25px;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-generate:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
+    }
+
+    .btn-generate svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #8892b0;
+    }
+
+    .empty-state svg {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+    .loading {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+
+    .loading .btn-generate {
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .cards-container {
+        padding-bottom: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="header-nav">
+    <a href="{{ url_for('logout') }}" class="logout-link">로그아웃</a>
+</div>
+
+<div class="character-profile card">
+    <div class="character-avatar">
+        {% if character.image_path %}
+            <img src="/uploads/{{ character.image_path }}" alt="{{ character.name }}">
+        {% else %}
+            <div class="default-avatar">{{ character.name[0] }}</div>
+        {% endif %}
+    </div>
+    <div class="character-name">{{ character.name }}</div>
+    <div class="character-desc">{{ character.description[:100] }}{% if character.description|length > 100 %}...{% endif %}</div>
+</div>
+
+<div class="section-title">오늘의 질문</div>
+
+<div class="cards-container">
+    {% if question_cards %}
+        {% for card in question_cards|reverse %}
+            <div class="question-card {% if card.is_answered %}answered{% endif %}">
+                <div class="question-day">Day {{ card.question.day_number }}</div>
+                <div class="question-text">{{ card.question.content }}</div>
+
+                {% if card.is_answered %}
+                    <div class="answer-box">
+                        <div class="answer-label">{{ character.name }}의 답변</div>
+                        <div class="answer-text">{{ card.answer.content }}</div>
+                    </div>
+                {% else %}
+                    <form method="POST" action="{{ url_for('answer_question', question_id=card.question.id) }}" class="answer-form">
+                        <button type="submit" class="btn-generate">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            답변 생성하기
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p>아직 질문이 없어요.<br>내일 첫 번째 질문이 열려요!</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    document.querySelectorAll('.answer-form').forEach(form => {
+        form.addEventListener('submit', function() {
+            this.classList.add('loading');
+            this.querySelector('.btn-generate').innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="animation: spin 1s linear infinite;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                생성 중...
+            `;
+        });
+    });
+</script>
+
+<style>
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
