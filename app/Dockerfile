@@ -12,9 +12,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-RUN mkdir -p /app/uploads
-RUN chmod +x entrypoint.sh
+RUN mkdir -p /app/uploads && chmod +x /app/entrypoint.sh
 
 EXPOSE 5000
 
-CMD ["./entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/app/entrypoint.sh"]
