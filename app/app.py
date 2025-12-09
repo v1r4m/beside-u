@@ -212,10 +212,13 @@ def answer_question(question_id):
     return redirect(url_for('dashboard'))
 
 
-with app.app_context():
-    db.create_all()
-    init_default_questions()
+def init_db():
+    """DB 초기화 (gunicorn preload용)"""
+    with app.app_context():
+        db.create_all()
+        init_default_questions()
 
 
 if __name__ == '__main__':
+    init_db()
     app.run(host='0.0.0.0', port=5000, debug=True)
